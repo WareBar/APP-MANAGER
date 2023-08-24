@@ -1,50 +1,27 @@
-from tkinter import Canvas, Tk
-from tkinter.constants import BOTH
-from tkinter.ttk import Label
-import time
-
-def move_window(event): # Moving the window
-    root.geometry(f'+{event.x_root}+{event.y_root}')
-
-def round_rectangle(x1, y1, x2, y2, radius=25, **kwargs): # Creating a rounded rectangle
-        
-        points = [x1+radius, y1,
-                x1+radius, y1,
-                x2-radius, y1,
-                x2-radius, y1,
-                x2, y1,
-                x2, y1+radius,
-                x2, y1+radius,
-                x2, y2-radius,
-                x2, y2-radius,
-                x2, y2,
-                x2-radius, y2,
-                x2-radius, y2,
-                x1+radius, y2,
-                x1+radius, y2,
-                x1, y2,
-                x1, y2-radius,
-                x1, y2-radius,
-                x1, y1+radius,
-                x1, y1+radius,
-                x1, y1]
-
-        return canvas.create_polygon(points, **kwargs, smooth=True, fill="black")
+from tkinter import *
+from PIL import Image, ImageTk
 
 root = Tk()
+root.config(bg="black")
 root.overrideredirect(1)
-root.bind("<B1-Motion>", move_window)
-root.eval('tk::PlaceWindow . center') # Placing the window in the center of the screen
-root.title("Simple Clock App")
-root.geometry('1100x200')
-root.config(background='grey')
-root.attributes("-transparentcolor", "grey") # So that it doesn't look like a square
+root.attributes("-transparentcolor","#800000")
+images = []  # to hold the newly created image
 
-canvas = Canvas(root, bg="grey", highlightthickness=0)
-canvas.pack(fill=BOTH, expand=1)
+def create_rectangle(x1, y1, x2, y2, **kwargs):
+    if 'alpha' in kwargs:
+        alpha = int(kwargs.pop('alpha') * 255)
+        fill = kwargs.pop('fill')
+        fill = root.winfo_rgb(fill) + (alpha,)
+        image = Image.new('RGBA', (x2-x1, y2-y1), fill)
+        images.append(ImageTk.PhotoImage(image))
+        canvas.create_image(x1, y1, image=images[-1], anchor='nw')
+    canvas.create_rectangle(x1, y1, x2, y2, **kwargs)
 
-round_rectangle(0, 0, 300, 200, radius=20) # Creating the rounded rectangle/window
+canvas = Canvas(width=300, height=200)
+canvas.pack()
 
-
+create_rectangle(10, 10, 200, 100, fill='blue')
+create_rectangle(50, 50, 250, 150, fill='green', alpha=.9)
+create_rectangle(80, 80, 150, 120, fill='#800000', alpha=.8)
 
 root.mainloop()
